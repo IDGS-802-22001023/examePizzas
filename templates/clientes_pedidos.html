@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto mt-6 p-6 bg-gray-100 border rounded-lg shadow">
+
+    <h2 class="text-2xl font-bold mb-6 text-center">
+        Detalle venta
+    </h2>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full border border-gray-300">
+
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="px-4 py-2 border">Cliente</th>
+                    <th class="px-4 py-2 border">Dirección</th>
+                    <th class="px-4 py-2 border">Teléfono</th>
+                    <th class="px-4 py-2 border">Fecha</th>
+                    <th class="px-4 py-2 border">Total</th>
+                    <th class="px-4 py-2 border">Detalles</th>
+                </tr>
+            </thead>
+
+            <tbody class="text-center">
+
+                {% for cliente in clientes %}
+                {% for pedido in cliente.pedidos %}
+
+                <tr class="border-t hover:bg-gray-50">
+                    <td class="px-4 py-2 border">{{ cliente.nombre }}</td>
+                    <td class="px-4 py-2 border">{{ cliente.direccion }}</td>
+                    <td class="px-4 py-2 border">{{ cliente.telefono }}</td>
+                    <td class="px-4 py-2 border">{{ pedido.fecha }}</td>
+                    <td class="px-4 py-2 border font-semibold">${{ pedido.total }}</td>
+
+                    <td class="px-4 py-2 border text-center">
+                        <center><a href="{{ url_for('pedidos.detalle_pedido', id=pedido.id_pedido) }}"
+                            style="background-color: #dc2626 !important; color: white !important; padding: 0.5rem 1rem; display: inline-block; border-radius: 0.5rem; text-align: center; text-decoration: none;"
+                            onmouseover="this.style.backgroundColor='#b91c1c'"
+                            onmouseout="this.style.backgroundColor='#dc2626'">
+                            Ver Detalles
+                        </a></center>
+                    </td>
+                </tr>
+
+                {% endfor %}
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

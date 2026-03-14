@@ -1,0 +1,155 @@
+{% extends "layout.html" %}
+{% from "_macros.html" import campoNuevo %}
+{% block content %}
+
+<style>
+    .fila {
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
+    }
+
+    .fila div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .fila input {
+        width: 180px;
+    }
+
+    table button {
+        cursor: pointer;
+    }
+</style>
+
+<h2>Nuevo Pedido</h2>
+
+<form method="POST">
+
+    {{ form.hidden_tag() }}
+
+    <fieldset>
+        <legend>Datos del Cliente</legend>
+
+        <div class="fila">
+            <div>
+                {{ campoNuevo(form.nombre) }}
+            </div>
+
+            <div>
+                {{ campoNuevo(form.direccion) }}
+            </div>
+
+            <div>
+                {{ campoNuevo(form.telefono) }}
+            </div>
+
+            <div>
+                <label>Fecha del Pedido</label>
+                <input type="date" name="fecha" value="{{ fecha }}" required>
+            </div>
+        </div>
+
+    </fieldset>
+
+    <fieldset>
+        <legend>Tamaño Pizza</legend>
+
+        <label>
+            <input type="radio" name="tamano" value="Chica">
+            Chica $40
+        </label>
+
+        <label>
+            <input type="radio" name="tamano" value="Mediana">
+            Mediana $80
+        </label>
+
+        <label>
+            <input type="radio" name="tamano" value="Grande">
+            Grande $120
+        </label>
+
+    </fieldset>
+
+    <fieldset>
+        <legend>Ingredientes</legend>
+
+        <label>
+            <input type="checkbox" name="ingredientes" value="Jamon">
+            Jamón $10
+        </label>
+
+        <label>
+            <input type="checkbox" name="ingredientes" value="Piña">
+            Piña $10
+        </label>
+
+        <label>
+            <input type="checkbox" name="ingredientes" value="Champiñones">
+            Champiñones $10
+        </label>
+
+    </fieldset>
+
+    <br>
+
+    <label>Número de Pizzas</label>
+
+    {{ campoNuevo(form.cantidad) }}
+
+    <h3>Detalle del Pedido</h3>
+
+    <table border="1" width="100%">
+        <tr>
+            <th>#</th>
+            <th>Tamaño</th>
+            <th>Ingredientes</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+            <th>Acción</th>
+        </tr>
+
+        {% for item in carrito %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ item.tamano }}</td>
+            <td>{{ item.ingredientes }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td>${{ item.subtotal }}</td>
+            <td>
+                <button type="submit" name="accion" value="eliminar"
+                    formaction="{{ url_for('pedidos.nuevo_pedido') }}?indice={{ loop.index0 }}"
+                    style="background-color:orange;color:white;padding:5px;border:none;">
+                    Eliminar
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+
+    <h3>Total del pedido: ${{ total }}</h3>
+
+    <br>
+
+    <button type="submit" name="accion" value="agregar"
+        style="background-color:red;color:white;padding:10px;border:none;">
+        Agregar Pizza
+    </button>
+
+    <button type="submit" name="accion" value="quitar"
+        style="background-color:red;color:white;padding:10px;border:none;">
+        Quitar Última
+    </button>
+
+    <button type="submit" name="accion" value="terminar"
+        style="background-color:red;color:white;padding:10px;border:none;">
+        Terminar Pedido
+    </button>
+
+</form>
+
+{% endblock %}

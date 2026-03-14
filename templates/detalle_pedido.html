@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto mt-6 p-6 border rounded-lg shadow bg-gray-100">
+
+    <h2 class="text-2xl font-bold mb-6 text-center text-red-600">
+        Detalles del Pedido #{{ pedido.id_pedido }}
+    </h2>
+
+    <div class="mb-4 text-gray-700">
+        <p><strong>Fecha:</strong> {{ pedido.fecha.strftime("%d/%m/%Y") }}</p>
+        <p class="text-xl font-semibold text-red-600">
+            <strong>Total:</strong> ${{ pedido.total }}
+        </p>
+    </div>
+
+    <div class="relative overflow-x-auto">
+        <table class="table-auto w-full border border-gray-300">
+            <thead class="bg-red-600 text-white">
+                <tr>
+                    <th class="px-4 py-2">Tamaño</th>
+                    <th class="px-4 py-2">Ingredientes</th>
+                    <th class="px-4 py-2">Cantidad</th>
+                    <th class="px-4 py-2">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-800">
+                {% for detalle, pizza in detalles %}
+                <tr class="hover:bg-gray-200">
+                    <td class="px-4 py-2">{{ pizza.tamano }}</td>
+                    <td class="px-4 py-2">{{ pizza.ingredientes }}</td>
+                    <td class="px-4 py-2">{{ detalle.cantidad }}</td>
+                    <td class="px-4 py-2">${{ detalle.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="flex justify-center mt-6">
+        <a href="{{ url_for('clientes.lista_clientes') }}"
+            class="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 rounded-lg shadow-lg transition-all duration-300 !important">
+            Volver
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

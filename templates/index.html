@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<style>
+
+.hero{
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.hero h1{
+    font-size:42px;
+    color:#c0392b;
+}
+
+.hero p{
+    font-size:18px;
+    color:#555;
+}
+
+/* tarjetas */
+
+.menu-cards{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    flex-wrap:wrap;
+}
+
+.card-menu{
+    background:white;
+    width:220px;
+    padding:30px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0px 5px 15px rgba(0,0,0,0.1);
+    transition:0.3s;
+}
+
+.card-menu:hover{
+    transform:translateY(-5px);
+    box-shadow:0px 8px 20px rgba(0,0,0,0.2);
+}
+
+.card-menu h3{
+    color:#c0392b;
+}
+
+.card-menu a{
+    display:inline-block;
+    margin-top:10px;
+    text-decoration:none;
+    background:#c0392b;
+    color:white;
+    padding:8px 16px;
+    border-radius:6px;
+    transition:0.3s;
+}
+
+.card-menu a:hover{
+    background:#e74c3c;
+}
+
+</style>
+
+
+<div class="hero">
+
+    <h1>🍕 Bienvenido a la Pizzería</h1>
+
+    <p>
+        Sistema de gestión de pedidos, clientes y ventas.
+    </p>
+
+</div>
+
+
+<div class="menu-cards">
+
+    <div class="card-menu">
+
+        <h3>Clientes</h3>
+
+        <p>Ver los clientes que han realizado pedidos.</p>
+
+        <a href="/clientes">Ir</a>
+
+    </div>
+
+
+    <div class="card-menu">
+
+        <h3>Pedidos</h3>
+
+        <p>Crear y administrar pedidos de pizzas.</p>
+
+        <a href="/pedidos">Ir</a>
+
+    </div>
+
+
+    <div class="card-menu">
+
+        <h3>Ventas por día</h3>
+
+        <p>Consultar ventas realizadas en un día.</p>
+
+        <a href="/ventas/dia">Ir</a>
+
+    </div>
+
+
+    <div class="card-menu">
+
+        <h3>Ventas por mes</h3>
+
+        <p>Consultar ventas realizadas en un mes.</p>
+
+        <a href="/ventas/mes">Ir</a>
+
+    </div>
+
+</div>
+
+{% endblock %}
