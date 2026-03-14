@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for
 from models import db, Clientes, Pedidos, DetallePedido, Pizzas
-from datetime import date, datetime
+from datetime import datetime
 from forms import PedidoForm
 
 pedidos_bp = Blueprint(
@@ -9,11 +9,9 @@ pedidos_bp = Blueprint(
     url_prefix="/pedidos"
 )
 
-# carrito en session
-def obtener_carrito():
-    if "carrito" not in session:
-        session["carrito"] = []
-    return session["carrito"]
+# carrito y datos del cliente en memoria
+carrito = []
+datos_cliente = {}
 
 @pedidos_bp.route("/detalle/<int:id>")
 def detalle_pedido(id):
@@ -32,21 +30,24 @@ def detalle_pedido(id):
         detalles=detalles
     )
 
+
 @pedidos_bp.route("/", methods=["GET", "POST"])
 def nuevo_pedido():
 
+    global carrito
+    global datos_cliente
+
     form = PedidoForm()
-    carrito = obtener_carrito()
 
     if request.method == "POST":
 
         accion = request.form.get("accion")
 
-        # guardar datos cliente y fecha en session
-        session["nombre"] = request.form.get("nombre")
-        session["direccion"] = request.form.get("direccion")
-        session["telefono"] = request.form.get("telefono")
-        session["fecha"] = request.form.get("fecha")
+        # guardar datos del cliente
+        datos_cliente["nombre"] = request.form.get("nombre")
+        datos_cliente["direccion"] = request.form.get("direccion")
+        datos_cliente["telefono"] = request.form.get("telefono")
+        datos_cliente["fecha"] = request.form.get("fecha")
 
         # -------- AGREGAR PIZZA --------
         if accion == "agregar":
@@ -76,20 +77,17 @@ def nuevo_pedido():
             }
 
             carrito.append(item)
-            session["carrito"] = carrito
 
         # -------- QUITAR ÚLTIMA PIZZA --------
         elif accion == "quitar":
             if carrito:
                 carrito.pop()
-                session["carrito"] = carrito
 
         # -------- ELIMINAR PIZZA POR FILA --------
         elif accion == "eliminar":
             indice = request.args.get("indice", type=int)
             if indice is not None and 0 <= indice < len(carrito):
                 carrito.pop(indice)
-                session["carrito"] = carrito
 
         # -------- TERMINAR PEDIDO --------
         elif accion == "terminar":
@@ -97,10 +95,10 @@ def nuevo_pedido():
             if not carrito:
                 return redirect(url_for("pedidos.nuevo_pedido"))
 
-            nombre = session.get("nombre")
-            direccion = session.get("direccion")
-            telefono = session.get("telefono")
-            fecha_str = session.get("fecha")
+            nombre = datos_cliente.get("nombre")
+            direccion = datos_cliente.get("direccion")
+            telefono = datos_cliente.get("telefono")
+            fecha_str = datos_cliente.get("fecha")
 
             if not nombre or not direccion or not telefono or not fecha_str:
                 return redirect(url_for("pedidos.nuevo_pedido"))
@@ -109,6 +107,7 @@ def nuevo_pedido():
             fecha_pedido = datetime.strptime(fecha_str, "%Y-%m-%d").date()
 
             try:
+
                 # cliente
                 cliente = Clientes(
                     nombre=nombre,
@@ -127,8 +126,9 @@ def nuevo_pedido():
                 db.session.add(pedido)
                 db.session.flush()
 
-                # detalle
+                # detalles
                 for item in carrito:
+
                     pizza = Pizzas(
                         tamano=item["tamano"],
                         ingredientes=item["ingredientes"],
@@ -147,12 +147,9 @@ def nuevo_pedido():
 
                 db.session.commit()
 
-                # limpiar carrito y session solo al finalizar
-                session.pop("carrito", None)
-                session.pop("nombre", None)
-                session.pop("direccion", None)
-                session.pop("telefono", None)
-                session.pop("fecha", None)
+                # limpiar datos
+                carrito.clear()
+                datos_cliente.clear()
 
                 return redirect(url_for("pedidos.nuevo_pedido"))
 
@@ -160,9 +157,7 @@ def nuevo_pedido():
                 db.session.rollback()
                 print("ERROR:", e)
 
-    # al renderizar, pasar fecha para que se mantenga en el formulario
-    fecha = session.get("fecha", "")
-
+    fecha = datos_cliente.get("fecha", "")
     total = sum(item["subtotal"] for item in carrito)
 
     return render_template(
